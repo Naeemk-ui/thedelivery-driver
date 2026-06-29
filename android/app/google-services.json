@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "958481833509",
+    "project_id": "the-delivery-fefc1",
+    "storage_bucket": "the-delivery-fefc1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:958481833509:android:d7ab89f0f9f3e11344a9cc",
+        "android_client_info": {
+          "package_name": "com.thedelivery.co.za.user"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCujorILzqrf3ZlP4Paaeddhh1aM0SEH_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:958481833509:android:03af9193ed7cf52744a9cc",
+        "android_client_info": {
+          "package_name": "com.thedelivery.driver_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCujorILzqrf3ZlP4Paaeddhh1aM0SEH_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
