@@ -3,6 +3,7 @@ import 'package:sixam_mart_delivery/api/api_client.dart';
 import 'package:sixam_mart_delivery/features/auth/domain/models/delivery_man_body_model.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
 import 'package:sixam_mart_delivery/features/auth/domain/models/vehicle_model.dart';
+import 'package:sixam_mart_delivery/helper/response_message_helper.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_snackbar_widget.dart';
 import 'package:get/get.dart';
@@ -89,9 +90,9 @@ class AuthController extends GetxController implements GetxService {
       await authServiceInterface.updateToken();
       responseModel = ResponseModel(true, 'successful');
     } else {
-      final String message = response.statusText?.trim().isNotEmpty == true
-          ? response.statusText!
-          : 'Invalid login details. Please check your phone number and password.';
+      final String message = ResponseMessageHelper.extractFromResponse(
+              response) ??
+          'Invalid login details. Please check your phone number and password.';
       responseModel = ResponseModel(false, message);
     }
     _isLoading = false;
