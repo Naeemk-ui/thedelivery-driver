@@ -17,8 +17,10 @@ class AuthService implements AuthServiceInterface {
   }
 
   @override
-  Future<bool> registerDeliveryMan(DeliveryManBodyModel deliveryManBody, List<MultipartBody> multiParts) async {
-    return await authRepositoryInterface.registerDeliveryMan(deliveryManBody, multiParts);
+  Future<bool> registerDeliveryMan(DeliveryManBodyModel deliveryManBody,
+      List<MultipartBody> multiParts) async {
+    return await authRepositoryInterface.registerDeliveryMan(
+        deliveryManBody, multiParts);
   }
 
   @override
@@ -32,8 +34,10 @@ class AuthService implements AuthServiceInterface {
   }
 
   @override
-  Future<bool> saveUserToken(String token, String zoneTopic, String vehicleWiseTopic) async {
-    return await authRepositoryInterface.saveUserToken(token, zoneTopic, vehicleWiseTopic);
+  Future<bool> saveUserToken(
+      String token, String zoneTopic, String vehicleWiseTopic) async {
+    return await authRepositoryInterface.saveUserToken(
+        token, zoneTopic, vehicleWiseTopic);
   }
 
   @override
@@ -52,8 +56,10 @@ class AuthService implements AuthServiceInterface {
   }
 
   @override
-  Future<void> saveUserNumberAndPassword(String number, String password, String countryCode) async {
-    await authRepositoryInterface.saveUserNumberAndPassword(number, password, countryCode);
+  Future<void> saveUserNumberAndPassword(
+      String number, String password, String countryCode) async {
+    await authRepositoryInterface.saveUserNumberAndPassword(
+        number, password, countryCode);
   }
 
   @override
@@ -87,37 +93,41 @@ class AuthService implements AuthServiceInterface {
   }
 
   @override
-  List<MultipartBody> prepareMultiPartsBody(XFile? pickedImage, List<XFile> pickedIdentities) {
+  List<MultipartBody> prepareMultiPartsBody(
+    XFile? pickedImage,
+    XFile? drivingLicense,
+    XFile? proofOfAddress,
+    XFile? bankConfirmation,
+  ) {
     List<MultipartBody> multiParts = [];
     multiParts.add(MultipartBody('image', pickedImage));
-    for(XFile file in pickedIdentities) {
-      multiParts.add(MultipartBody('identity_image[]', file));
+    multiParts.add(MultipartBody('driving_license_document', drivingLicense));
+    multiParts.add(MultipartBody('proof_of_address_document', proofOfAddress));
+    if (bankConfirmation != null) {
+      multiParts
+          .add(MultipartBody('bank_confirmation_document', bankConfirmation));
     }
     return multiParts;
   }
+
   @override
-  List<int?> vehicleIds (List<VehicleModel>? vehicles) {
+  List<int?> vehicleIds(List<VehicleModel>? vehicles) {
     List<int?>? vehicleIds = [];
     vehicleIds.add(0);
-    for(VehicleModel vehicle in vehicles!) {
+    for (VehicleModel vehicle in vehicles!) {
       vehicleIds.add(vehicle.id);
     }
     return vehicleIds;
   }
 
   @override
-  Future<XFile?> pickImageFromGallery() async{
-    XFile? pickImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if(pickImage != null) {
-      pickImage.length().then((value) {
-        if (value > 2000000) {
-          showCustomSnackBar('please_upload_lower_size_file'.tr);
-        } else {
-          return pickImage;
-        }
-      });
+  Future<XFile?> pickImageFromGallery() async {
+    final XFile? pickImage = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, imageQuality: 88);
+    if (pickImage != null && await pickImage.length() > 10000000) {
+      showCustomSnackBar('Please upload a file smaller than 10 MB.');
+      return null;
     }
     return pickImage;
   }
-
 }

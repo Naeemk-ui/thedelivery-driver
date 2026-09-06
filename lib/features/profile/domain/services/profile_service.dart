@@ -8,6 +8,7 @@ import 'package:sixam_mart_delivery/features/profile/domain/models/profile_model
 import 'package:sixam_mart_delivery/features/profile/domain/repositories/profile_repository_interface.dart';
 import 'package:geocoding/geocoding.dart' as geo_coding;
 import 'package:sixam_mart_delivery/features/profile/domain/services/profile_service_interface.dart';
+import 'package:sixam_mart_delivery/features/profile/domain/models/driver_onboarding_model.dart';
 
 class ProfileService implements ProfileServiceInterface {
   final ProfileRepositoryInterface profileRepositoryInterface;
@@ -19,8 +20,10 @@ class ProfileService implements ProfileServiceInterface {
   }
 
   @override
-  Future<ResponseModel> updateProfile(ProfileModel userInfoModel, XFile? data, String token) async {
-    return await profileRepositoryInterface.updateProfile(userInfoModel, data, token);
+  Future<ResponseModel> updateProfile(
+      ProfileModel userInfoModel, XFile? data, String token) async {
+    return await profileRepositoryInterface.updateProfile(
+        userInfoModel, data, token);
   }
 
   @override
@@ -29,12 +32,15 @@ class ProfileService implements ProfileServiceInterface {
   }
 
   @override
-  Future<void> recordWebSocketLocation(RecordLocationBodyModel recordLocationBody) async {
-    await profileRepositoryInterface.recordWebSocketLocation(recordLocationBody);
+  Future<void> recordWebSocketLocation(
+      RecordLocationBodyModel recordLocationBody) async {
+    await profileRepositoryInterface
+        .recordWebSocketLocation(recordLocationBody);
   }
 
   @override
-  Future<Response> recordLocation(RecordLocationBodyModel recordLocationBody) async {
+  Future<Response> recordLocation(
+      RecordLocationBodyModel recordLocationBody) async {
     return await profileRepositoryInterface.recordLocation(recordLocationBody);
   }
 
@@ -44,13 +50,26 @@ class ProfileService implements ProfileServiceInterface {
   }
 
   @override
+  Future<DriverOnboardingModel?> getOnboarding() {
+    return profileRepositoryInterface.getOnboarding();
+  }
+
+  @override
+  Future<ResponseModel> uploadOnboardingDocument(String type, XFile file) {
+    return profileRepositoryInterface.uploadOnboardingDocument(type, file);
+  }
+
+  @override
   Future<String> addressPlaceMark(Position locationResult) async {
     String address;
-    try{
-      List<geo_coding.Placemark> addresses = await geo_coding.placemarkFromCoordinates(locationResult.latitude, locationResult.longitude);
+    try {
+      List<geo_coding.Placemark> addresses =
+          await geo_coding.placemarkFromCoordinates(
+              locationResult.latitude, locationResult.longitude);
       geo_coding.Placemark placeMark = addresses.first;
-      address = '${placeMark.name}, ${placeMark.subAdministrativeArea}, ${placeMark.isoCountryCode}';
-    }catch(e) {
+      address =
+          '${placeMark.name}, ${placeMark.subAdministrativeArea}, ${placeMark.isoCountryCode}';
+    } catch (e) {
       address = 'Unknown Location Found';
     }
     return address;
@@ -60,21 +79,35 @@ class ProfileService implements ProfileServiceInterface {
   void checkPermission(Function callback) async {
     LocationPermission permission = await Geolocator.requestPermission();
     permission = await Geolocator.checkPermission();
-    if(permission == LocationPermission.denied /*|| (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)*/) {
-      Get.dialog(CustomAlertDialogWidget(description: 'you_denied'.tr, onOkPressed: () async {
-        Get.back();
-        await Geolocator.requestPermission();
-        checkPermission(callback);
-      }), barrierDismissible: false);
-    }else if(permission == LocationPermission.deniedForever || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)) {
-      Get.dialog(CustomAlertDialogWidget(description: permission == LocationPermission.whileInUse ? 'you_denied'.tr : 'you_denied_forever'.tr, onOkPressed: () async {
-        Get.back();
-        await Geolocator.openAppSettings();
-        // checkPermission(callback);
-      }), barrierDismissible: false);
-    }else {
+    if (permission ==
+        LocationPermission
+            .denied /*|| (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)*/) {
+      Get.dialog(
+          CustomAlertDialogWidget(
+              description: 'you_denied'.tr,
+              onOkPressed: () async {
+                Get.back();
+                await Geolocator.requestPermission();
+                checkPermission(callback);
+              }),
+          barrierDismissible: false);
+    } else if (permission == LocationPermission.deniedForever ||
+        (GetPlatform.isIOS
+            ? false
+            : permission == LocationPermission.whileInUse)) {
+      Get.dialog(
+          CustomAlertDialogWidget(
+              description: permission == LocationPermission.whileInUse
+                  ? 'you_denied'.tr
+                  : 'you_denied_forever'.tr,
+              onOkPressed: () async {
+                Get.back();
+                await Geolocator.openAppSettings();
+                // checkPermission(callback);
+              }),
+          barrierDismissible: false);
+    } else {
       callback();
     }
   }
-
 }

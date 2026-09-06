@@ -12,6 +12,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart_delivery/features/profile/domain/services/profile_service_interface.dart';
+import 'package:sixam_mart_delivery/features/profile/domain/models/driver_onboarding_model.dart';
 
 class ProfileController extends GetxController implements GetxService {
   final ProfileServiceInterface profileServiceInterface;
@@ -26,6 +27,12 @@ class ProfileController extends GetxController implements GetxService {
   XFile? _pickedFile;
   XFile? get pickedFile => _pickedFile;
 
+  DriverOnboardingModel? _onboarding;
+  DriverOnboardingModel? get onboarding => _onboarding;
+
+  bool _onboardingLoading = false;
+  bool get onboardingLoading => _onboardingLoading;
+
   RecordLocationBodyModel? _recordLocation;
   RecordLocationBodyModel? get recordLocationBody => _recordLocation;
 
@@ -37,17 +44,25 @@ class ProfileController extends GetxController implements GetxService {
       _profileModel = profileModel;
       if (_profileModel!.active == 1) {
         LocationPermission permission = await Geolocator.checkPermission();
-        if(permission == LocationPermission.denied || permission == LocationPermission.deniedForever
-            || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)) {
-          Get.dialog(ConfirmationDialogWidget(
-            icon: Images.locationPermission, iconSize: 200, hasCancel: false,
-            description: 'this_app_collects_location_data'.tr,
-            onYesPressed: () {
-              Get.back();
-              profileServiceInterface.checkPermission(() => startLocationRecord());
-            },
-          ), barrierDismissible: false);
-        }else {
+        if (permission == LocationPermission.denied ||
+            permission == LocationPermission.deniedForever ||
+            (GetPlatform.isIOS
+                ? false
+                : permission == LocationPermission.whileInUse)) {
+          Get.dialog(
+              ConfirmationDialogWidget(
+                icon: Images.locationPermission,
+                iconSize: 200,
+                hasCancel: false,
+                description: 'this_app_collects_location_data'.tr,
+                onYesPressed: () {
+                  Get.back();
+                  profileServiceInterface
+                      .checkPermission(() => startLocationRecord());
+                },
+              ),
+              barrierDismissible: false);
+        } else {
           startLocationRecord();
         }
       } else {
@@ -57,10 +72,12 @@ class ProfileController extends GetxController implements GetxService {
     update();
   }
 
-  Future<bool> updateUserInfo(ProfileModel updateUserModel, String token) async {
+  Future<bool> updateUserInfo(
+      ProfileModel updateUserModel, String token) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await profileServiceInterface.updateProfile(updateUserModel, _pickedFile, token);
+    ResponseModel responseModel = await profileServiceInterface.updateProfile(
+        updateUserModel, _pickedFile, token);
     _isLoading = false;
     if (responseModel.isSuccess) {
       _profileModel = updateUserModel;
@@ -83,23 +100,32 @@ class ProfileController extends GetxController implements GetxService {
   }
 
   Future<bool> updateActiveStatus() async {
-    ResponseModel responseModel = await profileServiceInterface.updateActiveStatus();
+    ResponseModel responseModel =
+        await profileServiceInterface.updateActiveStatus();
     if (responseModel.isSuccess) {
       _profileModel!.active = _profileModel!.active == 0 ? 1 : 0;
       showCustomSnackBar(responseModel.message, isError: false);
       if (_profileModel!.active == 1) {
         LocationPermission permission = await Geolocator.checkPermission();
-        if(permission == LocationPermission.denied || permission == LocationPermission.deniedForever
-            || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)) {
-          Get.dialog(ConfirmationDialogWidget(
-            icon: Images.locationPermission, iconSize: 200, hasCancel: false,
-            description: 'this_app_collects_location_data'.tr,
-            onYesPressed: () {
-              Get.back();
-              profileServiceInterface.checkPermission(() => startLocationRecord());
-            },
-          ), barrierDismissible: false);
-        }else {
+        if (permission == LocationPermission.denied ||
+            permission == LocationPermission.deniedForever ||
+            (GetPlatform.isIOS
+                ? false
+                : permission == LocationPermission.whileInUse)) {
+          Get.dialog(
+              ConfirmationDialogWidget(
+                icon: Images.locationPermission,
+                iconSize: 200,
+                hasCancel: false,
+                description: 'this_app_collects_location_data'.tr,
+                onYesPressed: () {
+                  Get.back();
+                  profileServiceInterface
+                      .checkPermission(() => startLocationRecord());
+                },
+              ),
+              barrierDismissible: false);
+        } else {
           startLocationRecord();
         }
       } else {
@@ -122,10 +148,44 @@ class ProfileController extends GetxController implements GetxService {
       Get.find<AuthController>().clearSharedData();
       stopLocationRecord();
       Get.offAllNamed(RouteHelper.getSignInRoute());
-    }else{
+    } else {
       Get.back();
       showCustomSnackBar(responseModel.message, isError: true);
     }
+  }
+
+  Future<void> getOnboarding() async {
+    _onboardingLoading = true;
+    update();
+    _onboarding = await profileServiceInterface.getOnboarding();
+    _onboardingLoading = false;
+    update();
+  }
+
+  Future<void> uploadOnboardingDocument(String type) async {
+    final XFile? file = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, imageQuality: 88);
+    if (file == null) {
+      return;
+    }
+    if (await file.length() > 10000000) {
+      showCustomSnackBar('Please upload a file smaller than 10 MB.');
+      return;
+    }
+
+    _onboardingLoading = true;
+    update();
+    final ResponseModel result =
+        await profileServiceInterface.uploadOnboardingDocument(type, file);
+    if (result.isSuccess) {
+      showCustomSnackBar(result.message, isError: false);
+      _onboarding = await profileServiceInterface.getOnboarding();
+      await getProfile();
+    } else {
+      showCustomSnackBar(result.message, isError: true);
+    }
+    _onboardingLoading = false;
+    update();
   }
 
   void startLocationRecord() {
@@ -141,17 +201,19 @@ class ProfileController extends GetxController implements GetxService {
 
   Future<void> recordLocation() async {
     final Position locationResult = await Geolocator.getCurrentPosition();
-    String address = await profileServiceInterface.addressPlaceMark(locationResult);
+    String address =
+        await profileServiceInterface.addressPlaceMark(locationResult);
 
     _recordLocation = RecordLocationBodyModel(
-      location: address, latitude: locationResult.latitude, longitude: locationResult.longitude,
+      location: address,
+      latitude: locationResult.latitude,
+      longitude: locationResult.longitude,
     );
 
-    if(Get.find<SplashController>().configModel!.webSocketStatus!) {
+    if (Get.find<SplashController>().configModel!.webSocketStatus!) {
       await profileServiceInterface.recordWebSocketLocation(_recordLocation!);
     } else {
       await profileServiceInterface.recordLocation(_recordLocation!);
     }
   }
-
 }

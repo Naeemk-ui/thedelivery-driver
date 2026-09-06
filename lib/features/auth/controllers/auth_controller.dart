@@ -31,6 +31,15 @@ class AuthController extends GetxController implements GetxService {
   List<XFile> _pickedIdentities = [];
   List<XFile> get pickedIdentities => _pickedIdentities;
 
+  XFile? _pickedDrivingLicense;
+  XFile? get pickedDrivingLicense => _pickedDrivingLicense;
+
+  XFile? _pickedProofOfAddress;
+  XFile? get pickedProofOfAddress => _pickedProofOfAddress;
+
+  XFile? _pickedBankConfirmation;
+  XFile? get pickedBankConfirmation => _pickedBankConfirmation;
+
   final List<String> _identityTypeList = ['passport', 'driving_license', 'nid'];
   List<String> get identityTypeList => _identityTypeList;
 
@@ -104,7 +113,11 @@ class AuthController extends GetxController implements GetxService {
     _isLoading = true;
     update();
     List<MultipartBody> multiParts = authServiceInterface.prepareMultiPartsBody(
-        _pickedImage, _pickedIdentities);
+      _pickedImage,
+      _pickedDrivingLicense,
+      _pickedProofOfAddress,
+      _pickedBankConfirmation,
+    );
     bool isSuccess = await authServiceInterface.registerDeliveryMan(
         deliveryManBody, multiParts);
     if (isSuccess) {
@@ -224,6 +237,9 @@ class AuthController extends GetxController implements GetxService {
     if (isRemove) {
       _pickedImage = null;
       _pickedIdentities = [];
+      _pickedDrivingLicense = null;
+      _pickedProofOfAddress = null;
+      _pickedBankConfirmation = null;
     } else {
       if (isLogo) {
         _pickedImage = await authServiceInterface.pickImageFromGallery();
@@ -245,6 +261,33 @@ class AuthController extends GetxController implements GetxService {
 
   void removeIdentityImage(int index) {
     _pickedIdentities.removeAt(index);
+    update();
+  }
+
+  Future<void> pickOnboardingDocument(String type) async {
+    final XFile? file = await authServiceInterface.pickImageFromGallery();
+    if (file == null) {
+      return;
+    }
+
+    if (type == 'driving_license') {
+      _pickedDrivingLicense = file;
+    } else if (type == 'proof_of_address') {
+      _pickedProofOfAddress = file;
+    } else if (type == 'bank_confirmation') {
+      _pickedBankConfirmation = file;
+    }
+    update();
+  }
+
+  void removeOnboardingDocument(String type) {
+    if (type == 'driving_license') {
+      _pickedDrivingLicense = null;
+    } else if (type == 'proof_of_address') {
+      _pickedProofOfAddress = null;
+    } else if (type == 'bank_confirmation') {
+      _pickedBankConfirmation = null;
+    }
     update();
   }
 

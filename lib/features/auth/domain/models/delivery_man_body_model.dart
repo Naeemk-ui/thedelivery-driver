@@ -43,11 +43,12 @@ class DeliveryManBodyModel {
     data['phone'] = phone!;
     data['email'] = email!;
     data['password'] = password!;
-    data['identity_type'] = identityType!;
+    data['identity_type'] = 'driving_license';
     data['identity_number'] = identityNumber!;
     data['earning'] = earning!;
     data['zone_id'] = zoneId!;
     data['vehicle_id'] = vehicleId!;
+    data['external_verification_consent'] = '1';
     return data;
   }
 }

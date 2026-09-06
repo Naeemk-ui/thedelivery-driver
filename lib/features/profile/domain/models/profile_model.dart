@@ -1,3 +1,5 @@
+import 'package:sixam_mart_delivery/features/profile/domain/models/driver_onboarding_model.dart';
+
 class ProfileModel {
   int? id;
   String? fName;
@@ -33,6 +35,8 @@ class ProfileModel {
   double? withDrawableBalance;
   double? totalWithdrawn;
   bool? showPayNowButton;
+  bool? payoutLocked;
+  DriverOnboardingModel? onboardingSummary;
 
   ProfileModel({
     this.id,
@@ -69,6 +73,8 @@ class ProfileModel {
     this.withDrawableBalance,
     this.totalWithdrawn,
     this.showPayNowButton,
+    this.payoutLocked,
+    this.onboardingSummary,
   });
 
   ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -106,6 +112,10 @@ class ProfileModel {
     withDrawableBalance = json['withdraw_able_balance']?.toDouble();
     totalWithdrawn = json['total_withdrawn']?.toDouble();
     showPayNowButton = json['show_pay_now_button'];
+    payoutLocked = json['payout_locked'] == true;
+    onboardingSummary = json['onboarding_summary'] is Map<String, dynamic>
+        ? DriverOnboardingModel.fromJson(json['onboarding_summary'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -144,6 +154,7 @@ class ProfileModel {
     data['withdraw_able_balance'] = withDrawableBalance;
     data['total_withdrawn'] = totalWithdrawn;
     data['show_pay_now_button'] = showPayNowButton;
+    data['payout_locked'] = payoutLocked;
     return data;
   }
 }
