@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_app_bar_widget.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/profile/domain/models/driver_onboarding_model.dart';
+import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 
@@ -68,7 +69,9 @@ class _DriverOnboardingScreenState extends State<DriverOnboardingScreen> {
                             height: Dimensions.paddingSizeExtraSmall),
                         Text(
                           onboarding.payoutLocked
-                              ? 'You can continue working. Upload every outstanding document to enable payouts.'
+                              ? onboarding.canWork
+                                  ? 'You can continue working. Upload every outstanding document to enable payouts.'
+                                  : 'Upload your driving licence and proof of address to activate your account. Bank confirmation is required before payouts.'
                               : 'Your documents are approved and payouts are available.',
                           style: robotoRegular,
                         ),
@@ -86,6 +89,16 @@ class _DriverOnboardingScreenState extends State<DriverOnboardingScreen> {
                 const SizedBox(height: Dimensions.paddingSizeLarge),
                 ...onboarding.documents.map(
                     (document) => _documentTile(context, controller, document)),
+                if (onboarding.canWork) ...[
+                  const SizedBox(height: Dimensions.paddingSizeSmall),
+                  FilledButton(
+                    onPressed: () async {
+                      await controller.getProfile();
+                      Get.offAllNamed(RouteHelper.getInitialRoute());
+                    },
+                    child: const Text('Continue to dashboard'),
+                  ),
+                ],
                 const SizedBox(height: Dimensions.paddingSizeLarge),
                 Text(
                   'Documents are stored privately. Only limited extracted text is used for verification. Photos must be clear and show the full document.',

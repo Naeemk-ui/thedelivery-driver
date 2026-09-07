@@ -97,7 +97,11 @@ class AuthController extends GetxController implements GetxService {
       authServiceInterface.saveUserToken(response.body['token'],
           response.body['zone_topic'], response.body['topic']);
       await authServiceInterface.updateToken();
-      responseModel = ResponseModel(true, 'successful');
+      responseModel = ResponseModel(
+        true,
+        'successful',
+        onboardingRequired: response.body['onboarding_required'] == true,
+      );
     } else {
       final String message = ResponseMessageHelper.extractFromResponse(
               response) ??
