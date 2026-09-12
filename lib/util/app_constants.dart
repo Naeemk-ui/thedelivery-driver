@@ -28,6 +28,8 @@ class AppConstants {
   static const String driverOnboardingUri = '/api/v1/delivery-man/onboarding';
   static const String driverOnboardingDocumentUri =
       '/api/v1/delivery-man/onboarding/documents';
+  static const String driverOnboardingConsentUri =
+      '/api/v1/delivery-man/onboarding/consent';
   static const String updateOrderStatusUri =
       '/api/v1/delivery-man/update-order-status';
   static const String updatePaymentStatusUri =

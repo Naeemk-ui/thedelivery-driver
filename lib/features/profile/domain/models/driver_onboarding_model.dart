@@ -1,6 +1,7 @@
 class DriverOnboardingModel {
   final String status;
   final bool payoutLocked;
+  final bool externalVerificationConsent;
   final bool canWork;
   final String? documentsDueAt;
   final int? daysRemaining;
@@ -9,6 +10,7 @@ class DriverOnboardingModel {
   const DriverOnboardingModel({
     required this.status,
     required this.payoutLocked,
+    required this.externalVerificationConsent,
     required this.canWork,
     required this.documents,
     this.documentsDueAt,
@@ -19,6 +21,8 @@ class DriverOnboardingModel {
     return DriverOnboardingModel(
       status: json['status']?.toString() ?? 'documents_pending',
       payoutLocked: json['payout_locked'] == true,
+      externalVerificationConsent:
+          json['external_verification_consent'] == true,
       canWork: json['can_work'] == true,
       documentsDueAt: json['documents_due_at']?.toString(),
       daysRemaining: json['days_remaining'] is num

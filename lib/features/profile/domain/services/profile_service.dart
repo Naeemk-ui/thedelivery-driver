@@ -55,6 +55,11 @@ class ProfileService implements ProfileServiceInterface {
   }
 
   @override
+  Future<ResponseModel> setOnboardingConsent(bool consent) {
+    return profileRepositoryInterface.setOnboardingConsent(consent);
+  }
+
+  @override
   Future<ResponseModel> uploadOnboardingDocument(String type, XFile file) {
     return profileRepositoryInterface.uploadOnboardingDocument(type, file);
   }

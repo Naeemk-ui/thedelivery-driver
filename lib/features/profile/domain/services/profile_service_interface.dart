@@ -16,6 +16,7 @@ abstract class ProfileServiceInterface {
   Future<Response> recordLocation(RecordLocationBodyModel recordLocationBody);
   Future<ResponseModel> deleteDriver();
   Future<DriverOnboardingModel?> getOnboarding();
+  Future<ResponseModel> setOnboardingConsent(bool consent);
   Future<ResponseModel> uploadOnboardingDocument(String type, XFile file);
   void checkPermission(Function callback);
   Future<String> addressPlaceMark(Position locationResult);

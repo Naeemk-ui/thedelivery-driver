@@ -117,6 +117,30 @@ class ProfileRepository implements ProfileRepositoryInterface {
   }
 
   @override
+  Future<ResponseModel> setOnboardingConsent(bool consent) async {
+    final Response response = await apiClient.postData(
+      AppConstants.driverOnboardingConsentUri,
+      {
+        'token': _getUserToken(),
+        'external_verification_consent': consent,
+      },
+      handleError: false,
+    );
+    if (response.statusCode == 200) {
+      return ResponseModel(
+        true,
+        response.body['message']?.toString() ??
+            'Verification preference updated.',
+      );
+    }
+    return ResponseModel(
+      false,
+      ResponseMessageHelper.extractFromResponse(response) ??
+          'Unable to update verification consent. Please try again.',
+    );
+  }
+
+  @override
   Future<ResponseModel> uploadOnboardingDocument(
       String type, XFile file) async {
     final Response response = await apiClient.postMultipartData(

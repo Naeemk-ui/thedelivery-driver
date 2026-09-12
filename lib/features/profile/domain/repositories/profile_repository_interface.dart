@@ -15,5 +15,6 @@ abstract class ProfileRepositoryInterface implements RepositoryInterface {
   Future<dynamic> recordLocation(RecordLocationBodyModel recordLocationBody);
   Future<dynamic> deleteDriver();
   Future<DriverOnboardingModel?> getOnboarding();
+  Future<ResponseModel> setOnboardingConsent(bool consent);
   Future<ResponseModel> uploadOnboardingDocument(String type, XFile file);
 }

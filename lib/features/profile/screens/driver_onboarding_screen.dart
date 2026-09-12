@@ -89,6 +89,36 @@ class _DriverOnboardingScreenState extends State<DriverOnboardingScreen> {
                 const SizedBox(height: Dimensions.paddingSizeLarge),
                 ...onboarding.documents.map(
                     (document) => _documentTile(context, controller, document)),
+                Container(
+                  margin: const EdgeInsets.only(
+                      top: Dimensions.paddingSizeExtraSmall),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius:
+                        BorderRadius.circular(Dimensions.radiusDefault),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .disabledColor
+                          .withValues(alpha: 0.25),
+                    ),
+                  ),
+                  child: CheckboxListTile(
+                    value: onboarding.externalVerificationConsent,
+                    onChanged: controller.onboardingLoading
+                        ? null
+                        : (value) =>
+                            controller.setOnboardingConsent(value ?? false),
+                    title: const Text('Automatic document verification'),
+                    subtitle: const Text(
+                      'Allow a limited, redacted text extract to be checked securely. Full document images are not sent.',
+                    ),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: Dimensions.paddingSizeSmall,
+                      vertical: Dimensions.paddingSizeExtraSmall,
+                    ),
+                  ),
+                ),
                 if (onboarding.canWork) ...[
                   const SizedBox(height: Dimensions.paddingSizeSmall),
                   FilledButton(

@@ -162,6 +162,21 @@ class ProfileController extends GetxController implements GetxService {
     update();
   }
 
+  Future<void> setOnboardingConsent(bool consent) async {
+    _onboardingLoading = true;
+    update();
+    final ResponseModel result =
+        await profileServiceInterface.setOnboardingConsent(consent);
+    if (result.isSuccess) {
+      _onboarding = await profileServiceInterface.getOnboarding();
+      showCustomSnackBar(result.message, isError: false);
+    } else {
+      showCustomSnackBar(result.message, isError: true);
+    }
+    _onboardingLoading = false;
+    update();
+  }
+
   Future<void> uploadOnboardingDocument(String type) async {
     final XFile? file = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 88);
