@@ -8,6 +8,14 @@ allprojects {
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
+    // Some Flutter plugins still declare an older compile SDK than their AndroidX dependencies need.
+    project.pluginManager.withPlugin('com.android.library') {
+        project.extensions.getByName('androidComponents').finalizeDsl { library ->
+            if (library.compileSdk != null && library.compileSdk < 36) {
+                library.compileSdk = 36
+            }
+        }
+    }
 }
 subprojects {
     afterEvaluate { project ->
